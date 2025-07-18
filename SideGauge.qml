@@ -241,8 +241,7 @@ CircularGauge {
             Image{
                 anchors.centerIn: parent
                 source: "qrc:/img/Ellipse 1.svg"
-                width: parent.width /10
-                height: parent.height /5
+
                 Image {
                     sourceSize: Qt.size(203,203)
                     anchors.centerIn: parent

@@ -291,8 +291,8 @@ ApplicationWindow {
             }
             property bool accelerating
             //-----------------
-            width: parent.width /3
-            height: parent.width /3
+            width: 400
+            height: 400
             //-------------------------------
             value: accelerating ? maximumValue : 0
             maximumValue: 250
