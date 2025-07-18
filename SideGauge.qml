@@ -8,7 +8,9 @@ import QtGraphicalEffects 1.0
 
 CircularGauge {
     id: gauge
+    //------------------------------------------------
 
+    //*******************
     property string speedColor: "yellow"
 
     // Define the radius and angle for the arc
@@ -232,11 +234,15 @@ CircularGauge {
         }
 
         foreground: Item {
+
             anchors.centerIn: parent
+
+
             Image{
                 anchors.centerIn: parent
                 source: "qrc:/img/Ellipse 1.svg"
-
+                width: parent.width /10
+                height: parent.height /5
                 Image {
                     sourceSize: Qt.size(203,203)
                     anchors.centerIn: parent

@@ -2,14 +2,19 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.3
+import QtLocation 5.11
+import QtPositioning 5.0
+
 ApplicationWindow {
     id:root
-    width: 1600
-    height: 1200
+    width: Screen.width
+    height: Screen.height
+    // visibility: "FullScreen"
     visible: true
     title: qsTr("Car Dashboard By Aksh")
     color: "#000000"
-
+    property bool isIncrementing     : true
+    property bool isIncrementingleft : true
     //background
     background: Image{
         anchors.fill:parent
@@ -19,6 +24,7 @@ ApplicationWindow {
     // Base Layer
 
     Image {
+        id : backgroundcluster
         anchors.centerIn: parent
         sourceSize: Qt.size(1492,717)
         source: "qrc:/icons/Base.svg"
@@ -57,8 +63,12 @@ ApplicationWindow {
                     onClicked: isGlow = !isGlow
                 }
                 MyButton{
+                    id : sttingsButton
                     setIcon: isGlow ? "qrc:/icons/light/clarity_settings-solid.svg" :  "qrc:/icons/clarity_settings-solid.svg"
-                    onClicked: isGlow = !isGlow
+                    onClicked : {
+                        isGlow = !isGlow;
+                        rectanglemap.visible = ! ( rectanglemap.visible);
+                    }
                 }
             }
         }
@@ -72,6 +82,7 @@ ApplicationWindow {
                 leftMargin: parent.width / 11
             }
             property bool accelerating
+            //this value was change and the old value was height and width 400
             width: 400
             height: 400
             value: accelerating ? maximumValue : 0
@@ -279,11 +290,114 @@ ApplicationWindow {
                 rightMargin: parent.width /11
             }
             property bool accelerating
-            width: 400
-            height: 400
+            //-----------------
+            width: parent.width /3
+            height: parent.width /3
+            //-------------------------------
             value: accelerating ? maximumValue : 0
             maximumValue: 250
             Behavior on value { NumberAnimation { duration: 1000 }}
         }
     }
+
+    //---------------------------------------------------------------------------
+    Timer {
+            id: valueSenderTimer
+            interval: 50
+            repeat: true
+            running: true
+
+            onTriggered: {
+                if (isIncrementing)
+                {
+                    rightGauge.value += 50;
+                    if (rightGauge.value>= 250)
+                    {
+                        isIncrementing = false;
+                    }
+                }
+                else
+                {
+                    rightGauge.value -= 50;
+                    if (rightGauge.value <= 0)
+                    {
+                        isIncrementing = true;
+                    }
+                }
+                if (isIncrementingleft)
+                {
+                    leftGauge.value  += 20;
+                    if (leftGauge.value >= 250)
+                    {
+                        isIncrementingleft  = false;
+                    }
+                }
+                else
+                {
+                    leftGauge.value -= 20;
+                    if (leftGauge.value  <= 0)
+                    {
+                        isIncrementingleft  = true;
+                    }
+                }
+
+            }
+
+        }
+    //------------------------------------Map Section------------------------------------------
+
+    property var destinationCoord: QtPositioning.coordinate(36.899, 10.2) // default
+
+
+    Plugin {
+            id: mapPlugin
+            name: "osm"
+        }
+    Rectangle{
+        id : rectanglemap
+        width: 1130
+        height: 320
+        radius: width / 5 //1.2
+        visible: false
+        clip: true
+        x: 360
+        y: 350
+        opacity: 1
+        z: -1
+        color: "#dfdcd5"
+
+        Map {
+
+            id: map
+            width: 900
+            height: 300
+            anchors.centerIn: parent
+            plugin: mapPlugin
+            center: QtPositioning.coordinate(36.8984457, 10.1872208) // actia 36.8984457,10.1872208,
+            zoomLevel: 14
+            opacity: 0.7
+            MapRoute {
+                id: mapRoute
+                route: routingModel.get(0).route
+            }
+
+            RouteModel {
+                id: routingModel
+                plugin: mapPlugin
+                query: RouteQuery {
+                    waypoints: [
+                        QtPositioning.coordinate(36.8984457, 10.1872208), // Start
+                        destinationCoord // Dynamic destination
+                    ]
+                }
+            }
+
+
+        }
+
+    }
+
+
+
+    //------------------------
 }
